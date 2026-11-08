@@ -68,7 +68,33 @@ D['frames']['pB_1'] = 'B银极90度.png'
 # b_00（scr00118）大致对着银心（有滚转），从这里逐渐向右扫出整条银道带
 D['anchor'] = {'frame': 'b_00', 'target': 'gc'}
 
-DATASETS = {'A': A, 'B': B, 'C': C, 'D': D}
+# E 组：统一网格拍摄（stellar_locator 要求的布局，已实测通过）。
+#   每圈 6 帧 × 60° 银经、首帧 l≈0（大致对银心）、带水平滚转≈0、
+#   两银极各 2 张互成 90° 滚转。短轴视场 60°，极限星等 ~10。
+#   'grid' 供 scripts/07_locate.py 构造 GridSpec；'truth' 仅供校准评分，现场不填。
+_E_PNG = [f'scr{n:05d}.png' for n in
+          list(range(183, 189)) + list(range(189, 195)) + list(range(197, 203))]
+E = {'out': 'framesE.npz',
+     'dir': 'D:/Program/deepseek/deepgame/12/tmp/picture/3',
+     'frames': {png: png[:-4] for png in _E_PNG},
+     'grid': {'bands': [(0.,   0., 60., [f'scr{n:05d}' for n in range(183, 189)]),
+                        (40.,  0., 60., [f'scr{n:05d}' for n in range(189, 195)]),
+                        (-40., 0., 60., [f'scr{n:05d}' for n in range(197, 203)])],
+              'poles': {'north': ['PA1', 'PA2'], 'south': ['PB1', 'PB2']},
+              'anchor': 'scr00183'},
+     'truth': {'dist_ly': 67.23, 'ra_deg': 21.2207823, 'dec_deg': 26.4523928},
+     }
+E['frames']['PA1.png'] = 'PA1'
+E['frames']['PA2.png'] = 'PA2'
+E['frames']['PB1.png'] = 'PB1'
+E['frames']['PB2.png'] = 'PB2'
+
+DATASETS = {'A': A, 'B': B, 'C': C, 'D': D, 'E': E}
+
+# B 组通过银道圈帧继承 A 组的绝对姿态（两组的重叠帧）
+# C 组是新位置，彼此不重叠，所以为 None
+LINK_TO = {'A': ['r0_00', 'r0_01', 'r0_02', 'r0_03', 'r0_04', 'r0_05', 'r0_06'],
+           'B': None, 'C': None, 'D': None, 'E': None}
 
 # B 组通过银道圈帧继承 A 组的绝对姿态（两组的重叠帧）
 # C 组是新位置，彼此不重叠，所以为 None
